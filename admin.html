@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreamLab · 后台管理</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#1a1610; --bg2:#221e14; --bg3:#2e2818; --bg4:#3a3220;
+  --border:#4a3e22; --border2:#6a5830;
+  --accent:#f5a020; --accent2:#ffcc44; --accent3:#f07020;
+  --ok:#7ecf60; --danger:#e05050;
+  --text:#fff0d0; --text2:#c8a870; --text3:#806840;
+  --mono:'IBM Plex Mono',monospace; --sans:'Noto Sans SC',sans-serif; --r:7px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 20% 20%,rgba(245,160,32,.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:20px;}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--accent3);}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:26px;height:26px;background:linear-gradient(135deg,var(--accent2),var(--accent3));clip-path:polygon(0 0,100% 50%,0 100%);box-shadow:0 0 12px rgba(245,160,32,.6);}
+.logo-name{font-family:var(--mono);font-size:.95rem;font-weight:600;color:var(--accent2);letter-spacing:3px;}
+.logo-sub{font-family:var(--mono);font-size:.62rem;color:var(--text3);letter-spacing:2px;}
+.header-right a{font-family:var(--mono);font-size:.65rem;color:var(--text3);text-decoration:none;border:1px solid var(--border);padding:5px 12px;border-radius:var(--r);transition:all .15s;}
+.header-right a:hover{border-color:var(--accent);color:var(--accent);}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:var(--mono);font-size:.7rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'▸';color:var(--accent);}
+.card-body{padding:16px;}
+
+/* INPUTS */
+.field{margin-bottom:12px;}
+.field label{font-family:var(--mono);font-size:.62rem;color:var(--text3);letter-spacing:1px;display:block;margin-bottom:5px;}
+.input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-family:var(--mono);font-size:.78rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+.input::placeholder{color:var(--text3);}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,160,32,.12);}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.input-row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;}
+@media(max-width:600px){.input-row,.input-row3{grid-template-columns:1fr;}}
+
+/* BUTTONS */
+.btn{font-family:var(--mono);font-size:.72rem;font-weight:600;padding:9px 18px;border-radius:var(--r);border:none;cursor:pointer;letter-spacing:1px;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#1a1000;box-shadow:0 2px 10px rgba(245,160,32,.3);}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger);}
+.btn-danger:hover{background:rgba(224,80,80,.12);}
+.btn-ok{background:var(--ok);color:#0a2010;}
+.btn-ok:hover{filter:brightness(1.1);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+
+/* STATUS */
+.status-bar{font-family:var(--mono);font-size:.68rem;padding:8px 12px;border-radius:var(--r);margin-top:10px;display:none;}
+.status-bar.ok{background:rgba(126,207,96,.1);border:1px solid rgba(126,207,96,.3);color:var(--ok);}
+.status-bar.err{background:rgba(224,80,80,.1);border:1px solid rgba(224,80,80,.3);color:#f09090;}
+.status-bar.info{background:rgba(245,160,32,.08);border:1px solid rgba(245,160,32,.2);color:var(--accent2);}
+
+/* TOKEN SECTION */
+.token-hint{font-family:var(--mono);font-size:.62rem;color:var(--text3);line-height:1.8;margin-top:8px;}
+.token-hint a{color:var(--accent);text-decoration:none;}
+.token-hint a:hover{color:var(--accent2);}
+.token-saved{font-family:var(--mono);font-size:.62rem;color:var(--ok);margin-top:6px;display:none;}
+
+/* CHANNEL TABLE */
+.ch-table{width:100%;border-collapse:collapse;}
+.ch-table th{font-family:var(--mono);font-size:.6rem;color:var(--text3);letter-spacing:1px;text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.ch-table td{padding:8px 10px;border-bottom:1px solid rgba(74,62,34,.5);font-size:.78rem;vertical-align:middle;}
+.ch-table tr:last-child td{border-bottom:none;}
+.ch-table tr:hover td{background:rgba(245,160,32,.04);}
+.td-name{color:var(--text);font-weight:500;}
+.td-url{color:var(--text3);font-family:var(--mono);font-size:.62rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td-proto .badge{font-family:var(--mono);font-size:.55rem;padding:2px 6px;border-radius:3px;border:1px solid;}
+.badge-hls{color:#f5a020;border-color:#f5a020;background:rgba(245,160,32,.1);}
+.badge-dash{color:#ffcc44;border-color:#ffcc44;background:rgba(255,204,68,.1);}
+.badge-flv{color:#e08840;border-color:#e08840;background:rgba(224,136,64,.1);}
+.badge-native,.badge-mp4{color:#c8a870;border-color:#c8a870;background:rgba(200,168,112,.1);}
+.td-group{font-family:var(--mono);font-size:.62rem;color:var(--accent3);}
+.td-actions{white-space:nowrap;}
+.btn-sm{font-family:var(--mono);font-size:.58rem;padding:4px 8px;border-radius:4px;border:1px solid;cursor:pointer;transition:all .15s;background:transparent;}
+.btn-sm.del{border-color:var(--danger);color:var(--danger);}
+.btn-sm.del:hover{background:rgba(224,80,80,.12);}
+.btn-sm.up{border-color:var(--border);color:var(--text3);}
+.btn-sm.up:hover{border-color:var(--accent);color:var(--accent);}
+
+.empty-table{text-align:center;padding:24px;font-family:var(--mono);font-size:.7rem;color:var(--text3);}
+
+/* JSON preview */
+.json-preview{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-family:var(--mono);font-size:.65rem;color:var(--text2);line-height:1.6;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;}
+
+/* LOCK SCREEN */
+#lockScreen{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;}
+.lock-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:32px;width:320px;text-align:center;}
+.lock-icon{font-size:2.5rem;margin-bottom:16px;}
+.lock-title{font-family:var(--mono);font-size:1rem;color:var(--accent2);letter-spacing:2px;margin-bottom:6px;}
+.lock-sub{font-family:var(--mono);font-size:.62rem;color:var(--text3);margin-bottom:20px;}
+.lock-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;font-family:var(--mono);font-size:.85rem;color:var(--text);outline:none;text-align:center;letter-spacing:4px;margin-bottom:10px;}
+.lock-input:focus{border-color:var(--accent);}
+.lock-err{font-family:var(--mono);font-size:.62rem;color:var(--danger);height:16px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title">STREAMLAB</div>
+    <div class="lock-sub">后台管理 · 请输入密码</div>
+    <input id="pwInput" class="lock-input" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="lock-err" id="pwErr"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="checkPw()">进入后台</button>
+    <p style="font-family:var(--mono);font-size:.58rem;color:var(--text3);margin-top:12px;">默认密码：admin888<br>（可在代码中修改）</p>
+  </div>
+</div>
+
+<div class="wrap" id="mainContent" style="display:none">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <div>
+      <div class="logo-name">STREAMLAB</div>
+      <div class="logo-sub">后台管理系统</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a href="index.html" target="_blank">← 前台播放器</a>
+  </div>
+</header>
+
+<!-- GITHUB SETTINGS -->
+<div class="card">
+  <div class="card-head">
+    <span class="card-title">GitHub 连接设置</span>
+    <span id="connStatus" style="font-family:var(--mono);font-size:.62rem;color:var(--text3)">未连接</span>
+  </div>
+  <div class="card-body">
+    <div class="input-row">
+      <div class="field">
+        <label>GitHub 用户名</label>
+        <input id="ghUser" class="input" type="text" placeholder="waiseng85">
+      </div>
+      <div class="field">
+        <label>仓库名称</label>
+        <input id="ghRepo" class="input" type="text" placeholder="Steam-player">
+      </div>
+    </div>
+    <div class="field">
+      <label>Personal Access Token（只存在本地浏览器）</label>
+      <input id="ghToken" class="input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      <div class="token-hint">
+        获取 Token：<a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a>
+        → 选 <strong>repo</strong> 权限 → Generate token → 复制粘贴到这里
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="saveSettings()">💾 保存设置</button>
+      <button class="btn btn-ghost" onclick="testConnection()">🔗 测试连接</button>
+      <button class="btn btn-ghost" onclick="loadFromGitHub()">⬇ 从 GitHub 加载频道</button>
+    </div>
+    <div class="status-bar" id="connBar"></div>
+  </div>
+</div>
+
+<!-- ADD CHANNEL -->
+<div class="card">
+  <div class="card-head">
+    <span class="card-title">添加频道</span>
+  </div>
+  <div class="card-body">
+    <div class="input-row3">
+      <div class="field">
+        <label>频道名称 *</label>
+        <input id="newName" class="input" type="text" placeholder="CCTV1 综合">
+      </div>
+      <div class="field">
+        <label>分组</label>
+        <input id="newGroup" class="input" type="text" placeholder="央视">
+      </div>
+      <div class="field">
+        <label>协议</label>
+        <select id="newProto" class="input">
+          <option value="auto">AUTO（自动）</option>
+          <option value="dash">DASH/MPD</option>
+          <option value="hls">HLS</option>
+          <option value="flv">FLV/HTTP-FLV</option>
+          <option value="native">MP4/Native</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>链接 URL *</label>
+      <input id="newUrl" class="input" type="text" placeholder="https://example.com/live/stream.mpd">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="addChannel()">＋ 添加到列表</button>
+    </div>
+    <div class="status-bar" id="addBar"></div>
+  </div>
+</div>
+
+<!-- CHANNEL LIST -->
+<div class="card">
+  <div class="card-head">
+    <span class="card-title">频道列表 <span id="totalCount" style="color:var(--accent);margin-left:8px">0 个</span></span>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" style="font-size:.62rem;padding:5px 12px" onclick="loadFromGitHub()">↺ 刷新</button>
+      <button class="btn btn-primary" style="font-size:.62rem;padding:5px 12px" onclick="pushToGitHub()">⬆ 保存到 GitHub</button>
+    </div>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="ch-table" id="chTable">
+      <thead>
+        <tr>
+          <th>频道名称</th>
+          <th>链接</th>
+          <th>协议</th>
+          <th>分组</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="chTbody">
+        <tr><td colspan="5" class="empty-table">暂无频道，请先连接 GitHub 加载</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card-body" style="border-top:1px solid var(--border)">
+    <div class="status-bar" id="pushBar"></div>
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn btn-danger" onclick="clearAll()">🗑 清空全部</button>
+      <button class="btn btn-ghost"  onclick="exportJson()">⬇ 导出 JSON</button>
+      <button class="btn btn-ghost"  onclick="importJson()">⬆ 导入 JSON</button>
+    </div>
+  </div>
+</div>
+
+<!-- JSON PREVIEW -->
+<div class="card">
+  <div class="card-head"><span class="card-title">JSON 预览</span></div>
+  <div class="card-body">
+    <div class="json-preview" id="jsonPreview">[]</div>
+  </div>
+</div>
+
+</div><!-- .wrap -->
+
+<script>
+// ── PASSWORD ─────────────────────────
+const ADMIN_PW = 'admin888'; // 改这里换密码
+function checkPw(){
+  const v = document.getElementById('pwInput').value;
+  if(v === ADMIN_PW){
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('mainContent').style.display='block';
+    loadSettings();
+    loadLocalChannels();
+  } else {
+    document.getElementById('pwErr').textContent='密码错误，请重试';
+    document.getElementById('pwInput').value='';
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkPw();});
+
+// ── SETTINGS ─────────────────────────
+function saveSettings(){
+  const u=document.getElementById('ghUser').value.trim();
+  const r=document.getElementById('ghRepo').value.trim();
+  const t=document.getElementById('ghToken').value.trim();
+  if(!u||!r||!t){showBar('connBar','请填写所有字段','err');return;}
+  localStorage.setItem('sl_ghUser',u);
+  localStorage.setItem('sl_ghRepo',r);
+  localStorage.setItem('sl_ghToken',t);
+  showBar('connBar','✓ 设置已保存到本地浏览器','ok');
+  document.getElementById('connStatus').textContent='已配置';
+  document.getElementById('connStatus').style.color='var(--ok)';
+}
+
+function loadSettings(){
+  const u=localStorage.getItem('sl_ghUser')||'';
+  const r=localStorage.getItem('sl_ghRepo')||'';
+  const t=localStorage.getItem('sl_ghToken')||'';
+  document.getElementById('ghUser').value=u;
+  document.getElementById('ghRepo').value=r;
+  document.getElementById('ghToken').value=t;
+  if(u&&r&&t){
+    document.getElementById('connStatus').textContent='已配置';
+    document.getElementById('connStatus').style.color='var(--ok)';
+  }
+}
+
+function getSettings(){
+  return {
+    user:  localStorage.getItem('sl_ghUser')||document.getElementById('ghUser').value.trim(),
+    repo:  localStorage.getItem('sl_ghRepo')||document.getElementById('ghRepo').value.trim(),
+    token: localStorage.getItem('sl_ghToken')||document.getElementById('ghToken').value.trim(),
+  };
+}
+
+// ── STATUS BARS ──────────────────────
+function showBar(id, msg, type='info'){
+  const el=document.getElementById(id);
+  el.className='status-bar '+type;
+  el.textContent=msg;
+  el.style.display='block';
+  if(type==='ok') setTimeout(()=>{el.style.display='none';},4000);
+}
+
+// ── LOCAL CHANNELS ───────────────────
+let channels=[];
+
+function loadLocalChannels(){
+  try{channels=JSON.parse(localStorage.getItem('sl_admin_ch')||'[]');}catch{channels=[];}
+  renderTable(); updatePreview();
+}
+
+function saveLocal(){
+  localStorage.setItem('sl_admin_ch',JSON.stringify(channels));
+}
+
+// ── GITHUB API ───────────────────────
+async function testConnection(){
+  const s=getSettings();
+  if(!s.user||!s.repo||!s.token){showBar('connBar','请先填写并保存设置','err');return;}
+  showBar('connBar','正在测试连接...','info');
+  try{
+    const res=await fetch(`https://api.github.com/repos/${s.user}/${s.repo}`,{
+      headers:{Authorization:`token ${s.token}`,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    showBar('connBar',`✓ 连接成功！仓库: ${data.full_name}`,'ok');
+  }catch(e){showBar('connBar','✗ 连接失败: '+e.message,'err');}
+}
+
+async function loadFromGitHub(){
+  const s=getSettings();
+  if(!s.user||!s.repo||!s.token){showBar('connBar','请先填写并保存设置','err');return;}
+  showBar('connBar','正在从 GitHub 加载...','info');
+  try{
+    const res=await fetch(`https://api.github.com/repos/${s.user}/${s.repo}/contents/channels.json`,{
+      headers:{Authorization:`token ${s.token}`,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(res.status===404){showBar('connBar','channels.json 不存在，将创建新文件','info');channels=[];saveLocal();renderTable();updatePreview();return;}
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const content=atob(data.content.replace(/\n/g,''));
+    channels=JSON.parse(content);
+    saveLocal();
+    renderTable(); updatePreview();
+    showBar('connBar',`✓ 加载成功，共 ${channels.length} 个频道`,'ok');
+  }catch(e){showBar('connBar','✗ 加载失败: '+e.message,'err');}
+}
+
+async function pushToGitHub(){
+  const s=getSettings();
+  if(!s.user||!s.repo||!s.token){showBar('pushBar','请先配置 GitHub 设置','err');return;}
+  showBar('pushBar','正在推送到 GitHub...','info');
+  try{
+    // Get current SHA
+    let sha='';
+    const check=await fetch(`https://api.github.com/repos/${s.user}/${s.repo}/contents/channels.json`,{
+      headers:{Authorization:`token ${s.token}`,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(check.ok){const d=await check.json();sha=d.sha;}
+
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(channels,null,2))));
+    const body={message:'update channels.json via StreamLab Admin',content};
+    if(sha) body.sha=sha;
+
+    const res=await fetch(`https://api.github.com/repos/${s.user}/${s.repo}/contents/channels.json`,{
+      method:'PUT',
+      headers:{Authorization:`token ${s.token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!res.ok){const e=await res.json();throw new Error(e.message||'HTTP '+res.status);}
+    showBar('pushBar',`✓ 已成功推送到 GitHub！前台将在 1 分钟内更新`,'ok');
+  }catch(e){showBar('pushBar','✗ 推送失败: '+e.message,'err');}
+}
+
+// ── CHANNEL CRUD ─────────────────────
+function addChannel(){
+  const name=document.getElementById('newName').value.trim();
+  const url=document.getElementById('newUrl').value.trim();
+  const group=document.getElementById('newGroup').value.trim()||'默认';
+  const proto=document.getElementById('newProto').value;
+  if(!name){showBar('addBar','请输入频道名称','err');return;}
+  if(!url){showBar('addBar','请输入链接','err');return;}
+  channels.push({name,url,proto,group});
+  saveLocal(); renderTable(); updatePreview();
+  document.getElementById('newName').value='';
+  document.getElementById('newUrl').value='';
+  showBar('addBar',`✓ 已添加「${name}」，记得点【保存到 GitHub】`,'ok');
+}
+
+function delChannel(i){
+  if(!confirm(`删除「${channels[i].name}」？`)) return;
+  channels.splice(i,1);
+  saveLocal(); renderTable(); updatePreview();
+}
+
+function moveUp(i){
+  if(i===0) return;
+  [channels[i-1],channels[i]]=[channels[i],channels[i-1]];
+  saveLocal(); renderTable(); updatePreview();
+}
+
+function renderTable(){
+  document.getElementById('totalCount').textContent=channels.length+' 个';
+  const tbody=document.getElementById('chTbody');
+  if(channels.length===0){tbody.innerHTML='<tr><td colspan="5" class="empty-table">暂无频道</td></tr>';return;}
+  tbody.innerHTML=channels.map((ch,i)=>`
+    <tr>
+      <td class="td-name">${esc(ch.name)}</td>
+      <td class="td-url" title="${esc(ch.url)}">${esc(ch.url)}</td>
+      <td class="td-proto"><span class="badge badge-${ch.proto||'auto'}">${(ch.proto||'auto').toUpperCase()}</span></td>
+      <td class="td-group">${esc(ch.group||'默认')}</td>
+      <td class="td-actions">
+        <button class="btn-sm up" onclick="moveUp(${i})">↑</button>
+        <button class="btn-sm del" onclick="delChannel(${i})">删除</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updatePreview(){
+  document.getElementById('jsonPreview').textContent=JSON.stringify(channels,null,2);
+}
+
+function clearAll(){
+  if(!confirm('确定清空所有频道？此操作不可撤销（但未推送到 GitHub 则不影响线上）')) return;
+  channels=[]; saveLocal(); renderTable(); updatePreview();
+}
+
+function exportJson(){
+  const blob=new Blob([JSON.stringify(channels,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='channels.json';a.click();
+}
+
+function importJson(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(!Array.isArray(data))throw new Error('格式错误');
+        channels=[...channels,...data];saveLocal();renderTable();updatePreview();
+        showBar('pushBar',`✓ 导入 ${data.length} 个频道，记得推送到 GitHub`,'ok');
+      }catch(err){showBar('pushBar','导入失败: '+err.message,'err');}
+    };r.readAsText(f);
+  };inp.click();
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>

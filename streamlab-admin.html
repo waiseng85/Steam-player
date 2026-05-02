@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreamLab · 后台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0b0e;
+    --bg-2: #12141a;
+    --bg-3: #1a1d26;
+    --line: #232733;
+    --line-2: #2e3340;
+    --text: #e8eaf0;
+    --text-2: #8a91a3;
+    --text-3: #555c6e;
+    --accent: #ffb547;
+    --accent-2: #ff7a45;
+    --green: #4ade80;
+    --red: #ef4444;
+    --blue: #60a5fa;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', system-ui, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(255, 181, 71, 0.06), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(96, 165, 250, 0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--line);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(10, 11, 14, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 10;
+  }
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .logo-mark {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+  .logo-mark span { color: var(--accent); }
+  .logo-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .stat-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-2);
+    padding: 6px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .stat-pill b { color: var(--accent); font-weight: 700; }
+
+  /* Layout */
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 880px) {
+    main { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+    header { padding: 16px; }
+  }
+
+  /* Panels */
+  .panel {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-2);
+    font-weight: 600;
+  }
+  .panel-title::before {
+    content: '▸ ';
+    color: var(--accent);
+  }
+  .panel-body { padding: 18px; }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-3);
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+  }
+  .tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: var(--bg);
+    color: var(--accent);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  label .req { color: var(--accent); }
+  input, select, textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  textarea {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    resize: vertical;
+    min-height: 180px;
+  }
+  .help-text {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Buttons */
+  button.btn {
+    background: var(--accent);
+    color: #1a1208;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button.btn:hover { background: #ffc266; transform: translateY(-1px); }
+  button.btn:active { transform: translateY(0); }
+  button.btn-secondary {
+    background: var(--bg-3);
+    color: var(--text);
+    border: 1px solid var(--line-2);
+  }
+  button.btn-secondary:hover { background: var(--line); }
+  button.btn-ghost {
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  button.btn-ghost:hover { color: var(--text); border-color: var(--line-2); }
+  button.btn-danger { background: var(--red); color: white; }
+  button.btn-block { width: 100%; justify-content: center; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* List */
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+  }
+  .channel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+  }
+  .channel-list::-webkit-scrollbar { width: 6px; }
+  .channel-list::-webkit-scrollbar-track { background: transparent; }
+  .channel-list::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 3px; }
+
+  .channel {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    transition: all 0.15s;
+  }
+  .channel:hover { border-color: var(--line-2); }
+  .channel.editing { border-color: var(--accent); background: var(--bg-2); }
+
+  .ch-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    width: 32px;
+    text-align: right;
+  }
+  .ch-info { min-width: 0; }
+  .ch-name {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+  .ch-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .ch-url {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+  .ch-tag {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-2);
+    flex-shrink: 0;
+  }
+  .ch-tag.proto { color: var(--blue); border-color: rgba(96,165,250,0.3); }
+  .ch-actions { display: flex; gap: 4px; }
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text-2);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { background: var(--bg-3); color: var(--text); }
+  .icon-btn.danger:hover { background: var(--red); color: white; border-color: var(--red); }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-3);
+  }
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-3);
+    border: 1px solid var(--line-2);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--green); }
+  .toast.error { border-color: var(--red); }
+
+  /* Modal */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 20px;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    max-width: 500px;
+    width: 100%;
+    overflow: hidden;
+  }
+  .modal-head { padding: 18px; border-bottom: 1px solid var(--line); }
+  .modal-body { padding: 18px; }
+  .modal-foot { padding: 14px 18px; border-top: 1px solid var(--line); display: flex; gap: 8px; justify-content: flex-end; }
+  .modal h3 { font-size: 16px; font-weight: 700; }
+  .modal p { color: var(--text-2); font-size: 14px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">STREAM<span>LAB</span>/</div>
+    <div class="logo-tag">admin · v1.0</div>
+  </div>
+  <div class="header-actions">
+    <div class="stat-pill">频道 <b id="stat-count">0</b></div>
+    <div class="stat-pill">分组 <b id="stat-groups">0</b></div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: ADD/IMPORT -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">添加源</div>
+    </div>
+    <div class="panel-body">
+      <div class="tabs">
+        <button class="tab active" data-tab="single">单条添加</button>
+        <button class="tab" data-tab="bulk">批量导入</button>
+      </div>
+
+      <!-- Single -->
+      <div id="tab-single">
+        <div class="form-group">
+          <label>频道名称 <span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="如：CCTV-1 综合">
+        </div>
+        <div class="form-group">
+          <label>播放地址 <span class="req">*</span></label>
+          <input type="text" id="f-url" placeholder="https://... .m3u8 / .mpd / .flv / .mp4">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>分组</label>
+            <input type="text" id="f-group" placeholder="如：央视 / 卫视" list="group-list">
+            <datalist id="group-list"></datalist>
+          </div>
+          <div class="form-group">
+            <label>协议</label>
+            <select id="f-proto">
+              <option value="auto">AUTO</option>
+              <option value="hls">HLS</option>
+              <option value="dash">DASH/MPD</option>
+              <option value="flv">FLV</option>
+              <option value="mp4">MP4</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Logo URL（可选）</label>
+          <input type="text" id="f-logo" placeholder="https://...">
+        </div>
+        <button class="btn btn-block" id="btn-add">＋ 添加频道</button>
+      </div>
+
+      <!-- Bulk -->
+      <div id="tab-bulk" style="display:none;">
+        <div class="form-group">
+          <label>粘贴内容（M3U / JSON）</label>
+          <textarea id="f-bulk" placeholder="#EXTM3U&#10;#EXTINF:-1 group-title=&quot;央视&quot;,CCTV-1&#10;https://...m3u8&#10;&#10;或 JSON 数组：&#10;[{&quot;name&quot;:&quot;...&quot;,&quot;url&quot;:&quot;...&quot;,&quot;group&quot;:&quot;...&quot;}]"></textarea>
+          <div class="help-text">自动识别 M3U 标签 (#EXTINF, group-title, tvg-logo) 或 JSON 数组格式。</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="btn-import">导入</button>
+          <button class="btn btn-secondary" id="btn-replace">导入并替换全部</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CHANNEL LIST -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">频道列表</div>
+      <div class="btn-row">
+        <button class="btn-ghost" id="btn-export-json">导出 JSON</button>
+        <button class="btn-ghost" id="btn-export-m3u">导出 M3U</button>
+        <button class="btn-ghost" id="btn-clear" style="color:var(--red);">清空</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="search" placeholder="🔍 搜索频道、分组、URL...">
+        <select id="filter-group" style="width:auto;">
+          <option value="">所有分组</option>
+        </select>
+      </div>
+      <div class="channel-list" id="list"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Confirm Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modal-title">确认</h3></div>
+    <div class="modal-body"><p id="modal-msg"></p></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" id="modal-cancel">取消</button>
+      <button class="btn btn-danger" id="modal-confirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== State =====
+const STORAGE_KEY = 'streamlab_channels_v1';
+let channels = [];
+let editingId = null;
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    channels = raw ? JSON.parse(raw) : [];
+  } catch { channels = []; }
+}
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(channels)); }
+
+// ===== Toast =====
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast ' + type, 2200);
+}
+
+// ===== Confirm Modal =====
+function confirm(title, msg) {
+  return new Promise(res => {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-msg').textContent = msg;
+    document.getElementById('modal').classList.add('show');
+    const ok = document.getElementById('modal-confirm');
+    const no = document.getElementById('modal-cancel');
+    const close = (v) => {
+      document.getElementById('modal').classList.remove('show');
+      ok.onclick = null; no.onclick = null;
+      res(v);
+    };
+    ok.onclick = () => close(true);
+    no.onclick = () => close(false);
+  });
+}
+
+// ===== Tabs =====
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-single').style.display = t.dataset.tab === 'single' ? '' : 'none';
+    document.getElementById('tab-bulk').style.display = t.dataset.tab === 'bulk' ? '' : 'none';
+  };
+});
+
+// ===== Add / Edit =====
+function getForm() {
+  return {
+    name: document.getElementById('f-name').value.trim(),
+    url: document.getElementById('f-url').value.trim(),
+    group: document.getElementById('f-group').value.trim() || '未分组',
+    protocol: document.getElementById('f-proto').value,
+    logo: document.getElementById('f-logo').value.trim()
+  };
+}
+function clearForm() {
+  ['f-name','f-url','f-logo'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-proto').value = 'auto';
+  editingId = null;
+  document.getElementById('btn-add').textContent = '＋ 添加频道';
+}
+
+document.getElementById('btn-add').onclick = () => {
+  const f = getForm();
+  if (!f.name || !f.url) { toast('名称和地址不能为空', 'error'); return; }
+  if (editingId) {
+    const i = channels.findIndex(c => c.id === editingId);
+    if (i >= 0) channels[i] = { ...channels[i], ...f };
+    toast('已更新', 'success');
+  } else {
+    channels.push({ id: uid(), ...f });
+    toast('已添加', 'success');
+  }
+  save(); render(); clearForm();
+};
+
+function startEdit(id) {
+  const c = channels.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('f-name').value = c.name;
+  document.getElementById('f-url').value = c.url;
+  document.getElementById('f-group').value = c.group || '';
+  document.getElementById('f-proto').value = c.protocol || 'auto';
+  document.getElementById('f-logo').value = c.logo || '';
+  editingId = id;
+  document.getElementById('btn-add').textContent = '✓ 保存修改';
+  document.querySelector('[data-tab="single"]').click();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function deleteChannel(id) {
+  const c = channels.find(x => x.id === id);
+  if (!c) return;
+  const ok = await confirm('删除频道', `确定删除「${c.name}」？此操作不可撤销。`);
+  if (!ok) return;
+  channels = channels.filter(x => x.id !== id);
+  save(); render(); toast('已删除');
+}
+
+// ===== Bulk Import =====
+function parseM3U(text) {
+  const lines = text.split(/\r?\n/);
+  const out = [];
+  let cur = null;
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) continue;
+    if (t.startsWith('#EXTINF')) {
+      const nameMatch = t.split(',').slice(1).join(',');
+      const groupMatch = t.match(/group-title="([^"]+)"/i);
+      const logoMatch = t.match(/tvg-logo="([^"]+)"/i);
+      cur = {
+        name: (nameMatch || '').trim(),
+        group: groupMatch ? groupMatch[1] : '未分组',
+        logo: logoMatch ? logoMatch[1] : ''
+      };
+    } else if (!t.startsWith('#') && cur) {
+      cur.url = t;
+      cur.protocol = detectProto(t);
+      out.push({ id: uid(), ...cur });
+      cur = null;
+    } else if (!t.startsWith('#') && !cur) {
+      // bare URL line
+      out.push({ id: uid(), name: t.split('/').pop() || 'Untitled', url: t, group: '未分组', protocol: detectProto(t), logo: '' });
+    }
+  }
+  return out;
+}
+function detectProto(url) {
+  const u = url.toLowerCase();
+  if (u.includes('.m3u8')) return 'hls';
+  if (u.includes('.mpd')) return 'dash';
+  if (u.includes('.flv')) return 'flv';
+  if (u.includes('.mp4')) return 'mp4';
+  return 'auto';
+}
+function parseInput(text) {
+  text = text.trim();
+  if (!text) return [];
+  // Try JSON first
+  if (text.startsWith('[') || text.startsWith('{')) {
+    try {
+      const j = JSON.parse(text);
+      const arr = Array.isArray(j) ? j : (j.channels || []);
+      return arr.map(x => ({
+        id: uid(),
+        name: x.name || x.title || 'Untitled',
+        url: x.url || x.src || '',
+        group: x.group || x.category || '未分组',
+        protocol: x.protocol || detectProto(x.url || ''),
+        logo: x.logo || x.icon || ''
+      })).filter(x => x.url);
+    } catch (e) { /* fall through */ }
+  }
+  // M3U
+  if (text.includes('#EXT') || text.split('\n').some(l => l.startsWith('http'))) {
+    return parseM3U(text);
+  }
+  return [];
+}
+
+document.getElementById('btn-import').onclick = () => {
+  const text = document.getElementById('f-bulk').value;
+  const parsed = parseInput(text);
+  if (parsed.length === 0) { toast('未识别到有效内容', 'error'); return; }
+  channels = channels.concat(parsed);
+  save(); render();
+  document.getElementById('f-bulk').value = '';
+  toast(`已导入 ${parsed.length} 条`, 'success');
+};
+document.getElementById('btn-replace').onclick = async () => {
+  const text = document.getElementById('f-bulk').value;
+  const parsed = parseInput(text);
+  if (parsed.length === 0) { toast('未识别到有效内容', 'error'); return; }
+  const ok = await confirm('替换全部', `这将删除现有 ${channels.length} 条，导入 ${parsed.length} 条新数据。继续？`);
+  if (!ok) return;
+  channels = parsed;
+  save(); render();
+  document.getElementById('f-bulk').value = '';
+  toast(`已替换为 ${parsed.length} 条`, 'success');
+};
+
+// ===== Export =====
+function download(filename, content, type = 'text/plain') {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+document.getElementById('btn-export-json').onclick = () => {
+  if (!channels.length) { toast('暂无数据', 'error'); return; }
+  const data = channels.map(({ id, ...rest }) => rest);
+  download('streamlab-channels.json', JSON.stringify({ channels: data }, null, 2), 'application/json');
+  toast('JSON 已导出', 'success');
+};
+document.getElementById('btn-export-m3u').onclick = () => {
+  if (!channels.length) { toast('暂无数据', 'error'); return; }
+  let m3u = '#EXTM3U\n';
+  for (const c of channels) {
+    const logo = c.logo ? ` tvg-logo="${c.logo}"` : '';
+    const grp = c.group ? ` group-title="${c.group}"` : '';
+    m3u += `#EXTINF:-1${logo}${grp},${c.name}\n${c.url}\n`;
+  }
+  download('streamlab-channels.m3u', m3u);
+  toast('M3U 已导出', 'success');
+};
+document.getElementById('btn-clear').onclick = async () => {
+  if (!channels.length) return;
+  const ok = await confirm('清空全部', `确定清空全部 ${channels.length} 条频道？`);
+  if (!ok) return;
+  channels = []; save(); render();
+  toast('已清空');
+};
+
+// ===== Search & Filter =====
+const searchInput = document.getElementById('search');
+const filterGroup = document.getElementById('filter-group');
+searchInput.oninput = render;
+filterGroup.onchange = render;
+
+// ===== Render =====
+function render() {
+  const q = searchInput.value.toLowerCase().trim();
+  const fg = filterGroup.value;
+  const list = document.getElementById('list');
+
+  // Stats
+  const groups = [...new Set(channels.map(c => c.group || '未分组'))];
+  document.getElementById('stat-count').textContent = channels.length;
+  document.getElementById('stat-groups').textContent = groups.length;
+
+  // Group dropdowns
+  const curFilter = filterGroup.value;
+  filterGroup.innerHTML = '<option value="">所有分组</option>' +
+    groups.map(g => `<option value="${escapeHtml(g)}" ${g === curFilter ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('');
+  document.getElementById('group-list').innerHTML =
+    groups.map(g => `<option value="${escapeHtml(g)}">`).join('');
+
+  // Filter
+  let filtered = channels;
+  if (fg) filtered = filtered.filter(c => (c.group || '未分组') === fg);
+  if (q) filtered = filtered.filter(c =>
+    (c.name || '').toLowerCase().includes(q) ||
+    (c.url || '').toLowerCase().includes(q) ||
+    (c.group || '').toLowerCase().includes(q)
+  );
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty">
+      <div class="empty-icon">📡</div>
+      <div>${channels.length === 0 ? '还没有任何频道，开始添加吧' : '没有匹配的结果'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map((c, i) => `
+    <div class="channel ${c.id === editingId ? 'editing' : ''}">
+      <div class="ch-num mono">${String(channels.indexOf(c) + 1).padStart(3, '0')}</div>
+      <div class="ch-info">
+        <div class="ch-name">${escapeHtml(c.name)}</div>
+        <div class="ch-meta">
+          <span class="ch-tag">${escapeHtml(c.group || '未分组')}</span>
+          <span class="ch-tag proto">${(c.protocol || 'auto').toUpperCase()}</span>
+          <span class="ch-url" title="${escapeHtml(c.url)}">${escapeHtml(c.url)}</span>
+        </div>
+      </div>
+      <div class="ch-actions">
+        <button class="icon-btn" onclick="startEdit('${c.id}')" title="编辑">✎</button>
+        <button class="icon-btn danger" onclick="deleteChannel('${c.id}')" title="删除">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[m]);
+}
+
+// ===== Init =====
+load();
+render();
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && editingId) clearForm();
+});
+</script>
+</body>
+</html>

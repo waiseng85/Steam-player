@@ -10,326 +10,159 @@
 <script src="https://cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
 <style>
 :root {
-  --bg:       #1a1610;
-  --bg2:      #221e14;
-  --bg3:      #2e2818;
-  --bg4:      #3a3220;
-  --border:   #4a3e22;
-  --border2:  #6a5830;
-  --accent:   #f5a020;
-  --accent2:  #ffcc44;
-  --accent3:  #f07020;
-  --ok:       #7ecf60;
-  --danger:   #e05050;
-  --text:     #fff0d0;
-  --text2:    #c8a870;
-  --text3:    #806840;
-  --mono:     'IBM Plex Mono', monospace;
-  --sans:     'Noto Sans SC', sans-serif;
-  --r:        7px;
+  --bg:      #1a1610;
+  --bg2:     #221e14;
+  --bg3:     #2e2818;
+  --bg4:     #3a3220;
+  --border:  #4a3e22;
+  --border2: #6a5830;
+  --accent:  #f5a020;
+  --accent2: #ffcc44;
+  --accent3: #f07020;
+  --ok:      #7ecf60;
+  --danger:  #e05050;
+  --text:    #fff0d0;
+  --text2:   #c8a870;
+  --text3:   #806840;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'Noto Sans SC', sans-serif;
+  --r:       7px;
 }
-
 * { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  min-height: 100vh;
-}
-
-/* subtle warm grain pattern */
+body { background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; }
 body::before {
-  content:'';
-  position:fixed; inset:0;
+  content:''; position:fixed; inset:0;
   background-image:
-    radial-gradient(circle at 20% 20%, rgba(245,160,32,0.06) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(240,112,32,0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 20%, rgba(245,160,32,.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(240,112,32,.05) 0%, transparent 50%);
   pointer-events:none; z-index:0;
 }
-
 .app { position:relative; z-index:1; display:flex; flex-direction:column; height:100vh; }
 
-/* ── HEADER ── */
+/* HEADER */
 header {
-  background: var(--bg2);
-  border-bottom: 2px solid var(--accent3);
-  padding: 0 20px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  box-shadow: 0 2px 20px rgba(245,160,32,0.12);
+  background:var(--bg2); border-bottom:2px solid var(--accent3);
+  padding:0 20px; height:54px;
+  display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+  box-shadow:0 2px 20px rgba(245,160,32,.12);
 }
-
 .logo { display:flex; align-items:center; gap:12px; }
-.logo-icon {
-  width:28px; height:28px;
-  background: linear-gradient(135deg, var(--accent2), var(--accent3));
-  clip-path: polygon(0 0, 100% 50%, 0 100%);
-  box-shadow: 0 0 14px rgba(245,160,32,0.6);
-}
-.logo-name {
-  font-family: var(--mono);
-  font-size: 1rem; font-weight:600;
-  color: var(--accent2);
-  letter-spacing: 3px;
-  text-shadow: 0 0 20px rgba(255,204,68,0.4);
-}
-.logo-ver {
-  font-family:var(--mono); font-size:.58rem;
-  color:var(--text3); background:var(--bg3);
-  border:1px solid var(--border); padding:2px 6px; border-radius:3px;
-}
-
+.logo-icon { width:28px; height:28px; background:linear-gradient(135deg,var(--accent2),var(--accent3)); clip-path:polygon(0 0,100% 50%,0 100%); box-shadow:0 0 14px rgba(245,160,32,.6); }
+.logo-name { font-family:var(--mono); font-size:1rem; font-weight:600; color:var(--accent2); letter-spacing:3px; text-shadow:0 0 20px rgba(255,204,68,.4); }
+.logo-ver { font-family:var(--mono); font-size:.58rem; color:var(--text3); background:var(--bg3); border:1px solid var(--border); padding:2px 6px; border-radius:3px; }
 .proto-badges { display:flex; gap:5px; flex-wrap:wrap; }
-.pbadge {
-  font-family:var(--mono); font-size:.58rem;
-  padding:2px 7px; border-radius:3px; border:1px solid; letter-spacing:1px;
-}
+.pbadge { font-family:var(--mono); font-size:.58rem; padding:2px 7px; border-radius:3px; border:1px solid; letter-spacing:1px; }
 .pbadge.hls  { color:#f5a020; border-color:#f5a020; background:rgba(245,160,32,.1); }
 .pbadge.dash { color:#ffcc44; border-color:#ffcc44; background:rgba(255,204,68,.1); }
 .pbadge.mpd  { color:#f07020; border-color:#f07020; background:rgba(240,112,32,.1); }
 .pbadge.flv  { color:#e08840; border-color:#e08840; background:rgba(224,136,64,.1); }
 .pbadge.mp4  { color:#c8a870; border-color:#c8a870; background:rgba(200,168,112,.1); }
 
-/* ── MAIN LAYOUT ── */
-.main {
-  flex:1;
-  display:grid;
-  grid-template-columns: 1fr 290px;
-  grid-template-rows: auto 1fr;
-  overflow:hidden;
-}
+/* MAIN */
+.main { flex:1; display:grid; grid-template-columns:1fr 290px; grid-template-rows:auto 1fr; overflow:hidden; }
 @media(max-width:720px){
   .main { grid-template-columns:1fr; grid-template-rows:auto auto 1fr; }
-  .channel-panel { grid-column:1; grid-row:3; border-left:none; border-top:1px solid var(--border); max-height:220px; }
+  .channel-panel { grid-column:1; grid-row:3; border-left:none; border-top:1px solid var(--border); max-height:240px; }
 }
 
-/* ── INPUT BAR ── */
-.input-bar {
-  grid-column:1;
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  padding:10px 14px;
-  display:flex; flex-direction:column; gap:8px;
-}
+/* INPUT BAR */
+.input-bar { grid-column:1; background:var(--bg2); border-bottom:1px solid var(--border); padding:10px 14px; display:flex; flex-direction:column; gap:8px; }
 .url-row { display:flex; gap:8px; }
-.url-input {
-  flex:1;
-  background:var(--bg3);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:9px 13px;
-  font-family:var(--mono); font-size:.78rem;
-  color:var(--text); outline:none;
-  transition:border-color .2s, box-shadow .2s;
-}
+.url-input { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); padding:9px 13px; font-family:var(--mono); font-size:.78rem; color:var(--text); outline:none; transition:border-color .2s,box-shadow .2s; }
 .url-input::placeholder { color:var(--text3); }
-.url-input:focus {
-  border-color:var(--accent);
-  box-shadow: 0 0 0 3px rgba(245,160,32,.15);
-}
-
-.btn {
-  font-family:var(--mono); font-size:.72rem; font-weight:600;
-  padding:9px 16px; border-radius:var(--r); border:none;
-  cursor:pointer; letter-spacing:1px; transition:all .15s; white-space:nowrap;
-}
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent3));
-  color: #1a1000;
-  box-shadow: 0 2px 10px rgba(245,160,32,.3);
-}
-.btn-primary:hover {
-  background: linear-gradient(135deg, var(--accent2), var(--accent));
-  box-shadow: 0 4px 18px rgba(245,160,32,.5);
-  transform: translateY(-1px);
-}
-.btn-primary:active { transform:translateY(0); }
+.url-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(245,160,32,.15); }
+.btn { font-family:var(--mono); font-size:.72rem; font-weight:600; padding:9px 16px; border-radius:var(--r); border:none; cursor:pointer; letter-spacing:1px; transition:all .15s; white-space:nowrap; }
+.btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent3)); color:#1a1000; box-shadow:0 2px 10px rgba(245,160,32,.3); }
+.btn-primary:hover { background:linear-gradient(135deg,var(--accent2),var(--accent)); box-shadow:0 4px 18px rgba(245,160,32,.5); transform:translateY(-1px); }
 .btn-success { background:var(--ok); color:#0a2010; }
 .btn-success:hover { filter:brightness(1.15); }
-.btn-ghost {
-  background:transparent; border:1px solid var(--border);
-  color:var(--text2);
-}
+.btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text2); }
 .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
 .btn-danger { background:transparent; border:1px solid var(--danger); color:var(--danger); }
 .btn-danger:hover { background:rgba(224,80,80,.12); }
-
 .opts-row { display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
 .opts-label { font-family:var(--mono); font-size:.6rem; color:var(--text3); letter-spacing:1px; }
-
-.proto-btn {
-  font-family:var(--mono); font-size:.6rem;
-  padding:3px 8px; border-radius:3px;
-  border:1px solid var(--border); background:transparent;
-  color:var(--text3); cursor:pointer; letter-spacing:1px; transition:all .15s;
-}
+.proto-btn { font-family:var(--mono); font-size:.6rem; padding:3px 8px; border-radius:3px; border:1px solid var(--border); background:transparent; color:var(--text3); cursor:pointer; letter-spacing:1px; transition:all .15s; }
 .proto-btn:hover { border-color:var(--accent); color:var(--accent); }
-.proto-btn.active {
-  border-color:var(--accent); color:var(--accent);
-  background:rgba(245,160,32,.12);
-}
+.proto-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(245,160,32,.12); }
 .sep { width:1px; height:16px; background:var(--border); }
-
-.example-chip {
-  font-family:var(--mono); font-size:.6rem;
-  padding:3px 9px; border-radius:12px;
-  border:1px solid var(--border); background:var(--bg3);
-  color:var(--text3); cursor:pointer; transition:all .15s;
-}
+.example-chip { font-family:var(--mono); font-size:.6rem; padding:3px 9px; border-radius:12px; border:1px solid var(--border); background:var(--bg3); color:var(--text3); cursor:pointer; transition:all .15s; }
 .example-chip:hover { color:var(--accent2); border-color:var(--accent2); background:rgba(255,204,68,.06); }
 
-/* ── PLAYER ── */
-.player-area {
-  grid-column:1; grid-row:2;
-  display:flex; flex-direction:column;
-  overflow:hidden; background:#100c06;
-}
-.player-topbar {
-  background:var(--bg2); border-bottom:1px solid var(--border);
-  padding:7px 14px; display:flex; align-items:center;
-  justify-content:space-between; flex-shrink:0;
-}
-.now-playing { display:flex; align-items:center; gap:10px; min-width:0; }
+/* PLAYER */
+.player-area { grid-column:1; grid-row:2; display:flex; flex-direction:column; overflow:hidden; background:#100c06; }
+.player-topbar { background:var(--bg2); border-bottom:1px solid var(--border); padding:7px 14px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; gap:8px; }
+.now-playing { display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
 .dot { width:8px; height:8px; border-radius:50%; background:var(--text3); flex-shrink:0; }
 .dot.live    { background:#f04040; box-shadow:0 0 8px #f04040; animation:blink 1.4s infinite; }
 .dot.ready   { background:var(--ok); box-shadow:0 0 6px var(--ok); }
 .dot.loading { background:var(--accent); animation:blink .7s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-.now-title {
-  font-family:var(--mono); font-size:.7rem; color:var(--text2);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:400px;
-}
-.stats-inline { display:flex; gap:14px; font-family:var(--mono); font-size:.6rem; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+.now-title { font-family:var(--mono); font-size:.7rem; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px; }
+.stats-inline { display:flex; gap:12px; font-family:var(--mono); font-size:.6rem; flex-shrink:0; }
 .stat { display:flex; gap:5px; }
 .stat-k { color:var(--text3); }
 .stat-v { color:var(--accent2); }
 
-.video-wrap {
-  flex:1; background:#000;
-  display:flex; align-items:center; justify-content:center;
-  position:relative; min-height:0;
+/* TRACK CONTROLS BAR */
+.track-bar {
+  background:var(--bg3); border-bottom:1px solid var(--border);
+  padding:6px 14px; display:none;
+  align-items:center; gap:10px; flex-wrap:wrap; flex-shrink:0;
 }
+.track-group { display:flex; align-items:center; gap:6px; }
+.track-label { font-family:var(--mono); font-size:.6rem; color:var(--text3); letter-spacing:1px; white-space:nowrap; }
+.track-select {
+  background:var(--bg4); border:1px solid var(--border);
+  border-radius:4px; padding:4px 8px;
+  font-family:var(--mono); font-size:.65rem; color:var(--text);
+  outline:none; cursor:pointer; transition:border-color .15s;
+  max-width:160px;
+}
+.track-select:focus { border-color:var(--accent); }
+.track-select option { background:var(--bg3); }
+.track-sep { width:1px; height:20px; background:var(--border); }
+
+.video-wrap { flex:1; background:#000; display:flex; align-items:center; justify-content:center; position:relative; min-height:0; }
 .placeholder { display:flex; flex-direction:column; align-items:center; gap:16px; }
-.play-icon {
-  width:72px; height:72px;
-  border:2px solid var(--bg4); border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  box-shadow: 0 0 30px rgba(245,160,32,0.1);
-}
-.play-icon::after {
-  content:''; width:0; height:0;
-  border-top:14px solid transparent; border-bottom:14px solid transparent;
-  border-left:22px solid var(--bg4); margin-left:7px;
-}
+.play-icon { width:72px; height:72px; border:2px solid var(--bg4); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(245,160,32,.1); }
+.play-icon::after { content:''; width:0; height:0; border-top:14px solid transparent; border-bottom:14px solid transparent; border-left:22px solid var(--bg4); margin-left:7px; }
 .placeholder p { font-family:var(--mono); font-size:.7rem; letter-spacing:2px; color:var(--text3); }
-
 video#player { width:100%; height:100%; display:none; background:#000; outline:none; }
+.error-bar { display:none; background:rgba(224,80,80,.1); border-top:1px solid rgba(224,80,80,.35); padding:8px 14px; font-family:var(--mono); font-size:.7rem; color:#f09090; flex-shrink:0; }
 
-.error-bar {
-  display:none; background:rgba(224,80,80,.1);
-  border-top:1px solid rgba(224,80,80,.35);
-  padding:8px 14px; font-family:var(--mono);
-  font-size:.7rem; color:#f09090; flex-shrink:0;
-}
-
-/* ── CHANNEL PANEL ── */
-.channel-panel {
-  grid-column:2; grid-row:1/3;
-  background:var(--bg2); border-left:1px solid var(--border);
-  display:flex; flex-direction:column; overflow:hidden;
-}
-.panel-head {
-  padding:11px 13px; border-bottom:1px solid var(--border);
-  display:flex; align-items:center; justify-content:space-between;
-  flex-shrink:0; background:var(--bg3);
-}
+/* CHANNEL PANEL */
+.channel-panel { grid-column:2; grid-row:1/3; background:var(--bg2); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+.panel-head { padding:11px 13px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; background:var(--bg3); }
 .panel-title { font-family:var(--mono); font-size:.68rem; color:var(--text2); letter-spacing:2px; text-transform:uppercase; }
-.ch-count {
-  font-family:var(--mono); font-size:.62rem;
-  background:linear-gradient(135deg,var(--accent),var(--accent3));
-  color:#1a1000; padding:2px 8px; border-radius:10px; font-weight:600;
-}
-
-.add-ch-form {
-  padding:9px 11px; border-bottom:1px solid var(--border);
-  display:flex; flex-direction:column; gap:6px; flex-shrink:0;
-}
-.ch-input {
-  background:var(--bg3); border:1px solid var(--border);
-  border-radius:5px; padding:6px 10px;
-  font-family:var(--mono); font-size:.7rem;
-  color:var(--text); outline:none; width:100%; transition:border-color .15s;
-}
+.ch-count { font-family:var(--mono); font-size:.62rem; background:linear-gradient(135deg,var(--accent),var(--accent3)); color:#1a1000; padding:2px 8px; border-radius:10px; font-weight:600; }
+.add-ch-form { padding:9px 11px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+.ch-input { background:var(--bg3); border:1px solid var(--border); border-radius:5px; padding:6px 10px; font-family:var(--mono); font-size:.7rem; color:var(--text); outline:none; width:100%; transition:border-color .15s; }
 .ch-input::placeholder { color:var(--text3); }
 .ch-input:focus { border-color:var(--accent); }
 .add-row { display:flex; gap:6px; }
 .add-row .btn { flex:1; font-size:.62rem; padding:6px 0; }
-
-.ch-list {
-  flex:1; overflow-y:auto;
-  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
-  padding:5px;
-}
-.ch-item {
-  display:flex; align-items:center; gap:8px;
-  padding:8px 9px; border-radius:6px; cursor:pointer;
-  margin-bottom:3px; border:1px solid transparent;
-  transition:all .15s; background:var(--bg3);
-}
+.ch-list { flex:1; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; padding:5px; }
+.ch-item { display:flex; align-items:center; gap:8px; padding:8px 9px; border-radius:6px; cursor:pointer; margin-bottom:3px; border:1px solid transparent; transition:all .15s; background:var(--bg3); }
 .ch-item:hover { border-color:var(--border2); background:var(--bg4); }
-.ch-item.active {
-  border-color:var(--accent); background:rgba(245,160,32,.1);
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-.ch-play-btn {
-  width:26px; height:26px; background:var(--bg4);
-  border-radius:50%; display:flex; align-items:center;
-  justify-content:center; flex-shrink:0; transition:all .15s;
-}
+.ch-item.active { border-color:var(--accent); background:rgba(245,160,32,.1); box-shadow:inset 3px 0 0 var(--accent); }
+.ch-play-btn { width:26px; height:26px; background:var(--bg4); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
 .ch-item:hover .ch-play-btn { background:var(--border2); }
 .ch-item.active .ch-play-btn { background:var(--accent); box-shadow:0 0 8px rgba(245,160,32,.4); }
-.ch-play-btn::after {
-  content:''; width:0; height:0;
-  border-top:5px solid transparent; border-bottom:5px solid transparent;
-  border-left:8px solid var(--text2); margin-left:2px;
-}
+.ch-play-btn::after { content:''; width:0; height:0; border-top:5px solid transparent; border-bottom:5px solid transparent; border-left:8px solid var(--text2); margin-left:2px; }
 .ch-item.active .ch-play-btn::after { border-left-color:#1a1000; }
 .ch-info { flex:1; min-width:0; }
 .ch-name { font-size:.78rem; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ch-proto { font-family:var(--mono); font-size:.56rem; color:var(--text3); letter-spacing:1px; margin-top:1px; }
-.ch-del {
-  width:20px; height:20px; background:transparent;
-  border:1px solid transparent; border-radius:3px;
-  color:var(--text3); cursor:pointer; font-size:.75rem;
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; transition:all .15s; opacity:0;
-}
+.ch-del { width:20px; height:20px; background:transparent; border:1px solid transparent; border-radius:3px; color:var(--text3); cursor:pointer; font-size:.75rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; opacity:0; }
 .ch-item:hover .ch-del { opacity:1; }
 .ch-del:hover { border-color:var(--danger); color:var(--danger); background:rgba(224,80,80,.1); }
-
-.empty-ch {
-  text-align:center; padding:30px 14px;
-  font-family:var(--mono); font-size:.68rem;
-  color:var(--text3); line-height:2;
-}
-
-.panel-foot {
-  padding:7px 11px; border-top:1px solid var(--border);
-  display:flex; gap:5px; flex-shrink:0; background:var(--bg3);
-}
+.empty-ch { text-align:center; padding:30px 14px; font-family:var(--mono); font-size:.68rem; color:var(--text3); line-height:2; }
+.panel-foot { padding:7px 11px; border-top:1px solid var(--border); display:flex; gap:5px; flex-shrink:0; background:var(--bg3); }
 .panel-foot .btn { flex:1; font-size:.58rem; padding:6px 0; }
 
-/* ── LOG BAR ── */
-.log-bar {
-  background:var(--bg2); border-top:1px solid var(--border);
-  padding:5px 14px; display:flex; gap:20px;
-  overflow-x:auto; flex-shrink:0; align-items:center;
-}
+/* LOG BAR */
+.log-bar { background:var(--bg2); border-top:1px solid var(--border); padding:5px 14px; display:flex; gap:20px; overflow-x:auto; flex-shrink:0; align-items:center; }
 .log-e { font-family:var(--mono); font-size:.6rem; color:var(--text3); white-space:nowrap; display:flex; gap:8px; }
 .log-t { color:var(--text3); }
 .log-m.ok   { color:var(--ok); }
@@ -344,12 +177,11 @@ video#player { width:100%; height:100%; display:none; background:#000; outline:n
 <body>
 <div class="app">
 
-<!-- HEADER -->
 <header>
   <div class="logo">
     <div class="logo-icon"></div>
     <span class="logo-name">STREAMLAB</span>
-    <span class="logo-ver">v2.0</span>
+    <span class="logo-ver">v3.0</span>
   </div>
   <div class="proto-badges">
     <span class="pbadge hls">HLS</span>
@@ -362,11 +194,9 @@ video#player { width:100%; height:100%; display:none; background:#000; outline:n
 
 <div class="main">
 
-  <!-- INPUT BAR -->
   <div class="input-bar">
     <div class="url-row">
-      <input id="urlInput" class="url-input" type="text"
-        placeholder="粘贴链接：.mpd / .m3u8 / .flv / .mp4 / http-flv ...">
+      <input id="urlInput" class="url-input" type="text" placeholder="粘贴链接：.mpd / .m3u8 / .flv / .mp4 ...">
       <button class="btn btn-primary" onclick="loadStream()">▶ 播放</button>
       <button class="btn btn-ghost"   onclick="stopAll()">■ 停止</button>
     </div>
@@ -386,12 +216,11 @@ video#player { width:100%; height:100%; display:none; background:#000; outline:n
     </div>
   </div>
 
-  <!-- PLAYER -->
   <div class="player-area">
     <div class="player-topbar">
       <div class="now-playing">
         <div class="dot" id="dot"></div>
-        <span class="now-title" id="nowTitle">— 待机中，输入链接开始播放 —</span>
+        <span class="now-title" id="nowTitle">— 待机中 —</span>
       </div>
       <div class="stats-inline" id="statsInline" style="display:none">
         <div class="stat"><span class="stat-k">PROTO</span><span class="stat-v" id="sStat">—</span></div>
@@ -400,6 +229,31 @@ video#player { width:100%; height:100%; display:none; background:#000; outline:n
         <div class="stat"><span class="stat-k">BUF</span><span class="stat-v" id="bStat">—</span></div>
       </div>
     </div>
+
+    <!-- 画质 / 音轨 / 字幕 控制栏 -->
+    <div class="track-bar" id="trackBar">
+      <div class="track-group">
+        <span class="track-label">🎬 画质</span>
+        <select class="track-select" id="qualitySelect" onchange="setQuality(this.value)">
+          <option value="-1">自动 (ABR)</option>
+        </select>
+      </div>
+      <div class="track-sep"></div>
+      <div class="track-group">
+        <span class="track-label">🔊 音轨</span>
+        <select class="track-select" id="audioSelect" onchange="setAudio(this.value)">
+          <option value="">默认</option>
+        </select>
+      </div>
+      <div class="track-sep"></div>
+      <div class="track-group">
+        <span class="track-label">💬 字幕</span>
+        <select class="track-select" id="subtitleSelect" onchange="setSubtitle(this.value)">
+          <option value="">关闭</option>
+        </select>
+      </div>
+    </div>
+
     <div class="video-wrap">
       <div class="placeholder" id="placeholder">
         <div class="play-icon"></div>
@@ -434,123 +288,316 @@ video#player { width:100%; height:100%; display:none; background:#000; outline:n
 
 </div>
 
-<!-- LOG BAR -->
 <div class="log-bar" id="logBar">
-  <div class="log-e"><span class="log-t">--:--:--</span><span class="log-m info">StreamLab v2.0 就绪 · HLS / DASH / MPD / FLV / MP4</span></div>
+  <div class="log-e"><span class="log-t">--:--:--</span><span class="log-m info">StreamLab v3.0 就绪 · 支持画质/音轨/字幕切换</span></div>
 </div>
 
 </div>
 <script>
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
 let proto='auto', hlsInst=null, dashInst=null, flvInst=null, ticker=null;
 let channels=[], activeIdx=-1;
+let currentEngine=''; // 'hls' | 'dash' | 'native'
 
-const video=document.getElementById('player');
-const urlInput=document.getElementById('urlInput');
-const dot=document.getElementById('dot');
-const nowTitle=document.getElementById('nowTitle');
-const errorBar=document.getElementById('errorBar');
-const statsInline=document.getElementById('statsInline');
-const placeholder=document.getElementById('placeholder');
-const chList=document.getElementById('chList');
-const logBar=document.getElementById('logBar');
+const video        = document.getElementById('player');
+const urlInput     = document.getElementById('urlInput');
+const dot          = document.getElementById('dot');
+const nowTitle     = document.getElementById('nowTitle');
+const errorBar     = document.getElementById('errorBar');
+const statsInline  = document.getElementById('statsInline');
+const placeholder  = document.getElementById('placeholder');
+const chList       = document.getElementById('chList');
+const logBar       = document.getElementById('logBar');
+const trackBar     = document.getElementById('trackBar');
+const qualitySel   = document.getElementById('qualitySelect');
+const audioSel     = document.getElementById('audioSelect');
+const subtitleSel  = document.getElementById('subtitleSelect');
 
-const ts=()=>new Date().toTimeString().slice(0,8);
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+const ts = () => new Date().toTimeString().slice(0,8);
 
-function log(msg,type='info'){
-  const d=document.createElement('div');
-  d.className='log-e';
-  d.innerHTML=`<span class="log-t">${ts()}</span><span class="log-m ${type}">${msg}</span>`;
+function log(msg, type='info') {
+  const d = document.createElement('div');
+  d.className = 'log-e';
+  d.innerHTML = `<span class="log-t">${ts()}</span><span class="log-m ${type}">${msg}</span>`;
   logBar.prepend(d);
-  while(logBar.children.length>6) logBar.removeChild(logBar.lastChild);
+  while(logBar.children.length > 6) logBar.removeChild(logBar.lastChild);
 }
 
-function setDot(s){ dot.className='dot '+s; }
+function setDot(s) { dot.className = 'dot ' + s; }
 
-function showError(msg){
-  errorBar.style.display='block';
-  errorBar.textContent='⚠ '+msg;
-  log(msg,'err'); setDot('');
-  nowTitle.textContent='— 错误 —';
+function showError(msg) {
+  errorBar.style.display = 'block';
+  errorBar.textContent = '⚠ ' + msg;
+  log(msg, 'err'); setDot('');
+  nowTitle.textContent = '— 错误 —';
 }
-function clearErr(){ errorBar.style.display='none'; }
+function clearErr() { errorBar.style.display = 'none'; }
 
-function detectProto(url){
-  if(!url) return 'native';
-  const u=url.toLowerCase().split('?')[0];
-  if(u.endsWith('.m3u8')||u.includes('.m3u8')) return 'hls';
-  if(u.endsWith('.mpd') ||u.includes('.mpd'))  return 'dash';
-  if(u.endsWith('.flv'))                        return 'flv';
-  if(u.startsWith('rtmp'))                      return 'rtmp';
-  if(u.includes('hls')||u.includes('m3u'))      return 'hls';
-  if(u.includes('dash'))                        return 'dash';
+function detectProto(url) {
+  if (!url) return 'native';
+  const u = url.toLowerCase().split('?')[0];
+  if (u.endsWith('.m3u8') || u.includes('.m3u8')) return 'hls';
+  if (u.endsWith('.mpd')  || u.includes('.mpd'))  return 'dash';
+  if (u.endsWith('.flv'))                          return 'flv';
+  if (u.startsWith('rtmp'))                        return 'rtmp';
+  if (u.includes('hls') || u.includes('m3u'))     return 'hls';
+  if (u.includes('dash'))                          return 'dash';
   return 'native';
 }
 
-const protoLabel=p=>({hls:'HLS',dash:'DASH/MPD',flv:'FLV/HTTP-FLV',native:'MP4/Native',rtmp:'RTMP'}[p]||p.toUpperCase());
+const protoLabel = p => ({hls:'HLS',dash:'DASH/MPD',flv:'FLV/HTTP-FLV',native:'MP4/Native',rtmp:'RTMP'}[p] || p.toUpperCase());
 
-function fmtTime(s){
-  if(!isFinite(s)) return 'LIVE ∞';
-  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=Math.floor(s%60);
-  return h?`${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`:`${m}:${String(ss).padStart(2,'0')}`;
+function fmtTime(s) {
+  if (!isFinite(s)) return 'LIVE ∞';
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=Math.floor(s%60);
+  return h ? `${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}` : `${m}:${String(ss).padStart(2,'0')}`;
 }
 
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function setProto(btn){
-  document.querySelectorAll('.proto-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); proto=btn.dataset.p;
+function setProto(btn) {
+  document.querySelectorAll('.proto-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  proto = btn.dataset.p;
 }
 
-function destroyAll(){
-  if(hlsInst){hlsInst.destroy();hlsInst=null;}
-  if(dashInst){dashInst.reset();dashInst=null;}
-  if(flvInst){flvInst.destroy();flvInst=null;}
-  if(ticker){clearInterval(ticker);ticker=null;}
-  video.pause(); video.removeAttribute('src'); video.load();
-  video.style.display='none';
-  placeholder.style.display='flex';
-  statsInline.style.display='none';
+// ══════════════════════════════════════
+// TRACK BAR HELPERS
+// ══════════════════════════════════════
+function resetTrackBar() {
+  qualitySel.innerHTML  = '<option value="-1">自动 (ABR)</option>';
+  audioSel.innerHTML    = '<option value="">默认</option>';
+  subtitleSel.innerHTML = '<option value="">关闭</option>';
+  trackBar.style.display = 'none';
+}
+
+function showTrackBar() {
+  trackBar.style.display = 'flex';
+}
+
+// ── QUALITY ──────────────────────────
+function buildQualityOptions_HLS() {
+  if (!hlsInst) return;
+  const levels = hlsInst.levels;
+  if (!levels || levels.length <= 1) return;
+  qualitySel.innerHTML = '<option value="-1">自动 (ABR)</option>';
+  levels.forEach((l, i) => {
+    const h = l.height || '?';
+    const bw = l.bitrate ? Math.round(l.bitrate/1000)+'k' : '';
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${h}p ${bw}`.trim();
+    qualitySel.appendChild(opt);
+  });
+  showTrackBar();
+  log(`HLS: ${levels.length} 个画质可选`, 'ok');
+}
+
+function buildQualityOptions_DASH() {
+  if (!dashInst) return;
+  try {
+    const bitrateList = dashInst.getBitrateInfoListFor('video');
+    if (!bitrateList || bitrateList.length <= 1) return;
+    qualitySel.innerHTML = '<option value="-1">自动 (ABR)</option>';
+    bitrateList.forEach((b, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${b.height||'?'}p  ${Math.round(b.bitrate/1000)}k`;
+      qualitySel.appendChild(opt);
+    });
+    showTrackBar();
+    log(`DASH: ${bitrateList.length} 个画质可选`, 'ok');
+  } catch(e) {}
+}
+
+function setQuality(val) {
+  const v = parseInt(val);
+  if (currentEngine === 'hls' && hlsInst) {
+    hlsInst.currentLevel = v;
+    hlsInst.loadLevel = v;
+    log(v === -1 ? 'HLS 切换为自动画质' : `HLS 切换画质 → Level ${v}`, 'info');
+  } else if (currentEngine === 'dash' && dashInst) {
+    if (v === -1) {
+      dashInst.updateSettings({ streaming:{ abr:{ autoSwitchBitrate:{ video:true } } } });
+      log('DASH 切换为自动画质', 'info');
+    } else {
+      dashInst.updateSettings({ streaming:{ abr:{ autoSwitchBitrate:{ video:false } } } });
+      dashInst.setQualityFor('video', v);
+      log(`DASH 切换画质 → Q${v}`, 'info');
+    }
+  }
+}
+
+// ── AUDIO ────────────────────────────
+function buildAudioOptions_HLS() {
+  if (!hlsInst) return;
+  const tracks = hlsInst.audioTracks;
+  if (!tracks || tracks.length <= 1) return;
+  audioSel.innerHTML = '';
+  tracks.forEach((t, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = t.name || t.lang || `音轨 ${i+1}`;
+    audioSel.appendChild(opt);
+  });
+  showTrackBar();
+  log(`HLS: ${tracks.length} 个音轨`, 'ok');
+}
+
+function buildAudioOptions_DASH() {
+  if (!dashInst) return;
+  try {
+    const tracks = dashInst.getTracksFor('audio');
+    if (!tracks || tracks.length <= 1) return;
+    audioSel.innerHTML = '';
+    tracks.forEach((t, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = t.lang || t.id || `音轨 ${i+1}`;
+      audioSel.appendChild(opt);
+    });
+    showTrackBar();
+    log(`DASH: ${tracks.length} 个音轨`, 'ok');
+  } catch(e) {}
+}
+
+function setAudio(val) {
+  if (val === '') return;
+  const v = parseInt(val);
+  if (currentEngine === 'hls' && hlsInst) {
+    hlsInst.audioTrack = v;
+    log(`HLS 切换音轨 → ${hlsInst.audioTracks[v]?.name || v}`, 'info');
+  } else if (currentEngine === 'dash' && dashInst) {
+    try {
+      const tracks = dashInst.getTracksFor('audio');
+      if (tracks && tracks[v]) {
+        dashInst.setCurrentTrack(tracks[v]);
+        log(`DASH 切换音轨 → ${tracks[v].lang || v}`, 'info');
+      }
+    } catch(e) {}
+  }
+}
+
+// ── SUBTITLE ─────────────────────────
+function buildSubtitleOptions_HLS() {
+  if (!hlsInst) return;
+  const tracks = hlsInst.subtitleTracks;
+  if (!tracks || tracks.length === 0) return;
+  subtitleSel.innerHTML = '<option value="-1">关闭</option>';
+  tracks.forEach((t, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = t.name || t.lang || `字幕 ${i+1}`;
+    subtitleSel.appendChild(opt);
+  });
+  showTrackBar();
+  log(`HLS: ${tracks.length} 个字幕轨`, 'ok');
+}
+
+function buildSubtitleOptions_DASH() {
+  if (!dashInst) return;
+  try {
+    const tracks = dashInst.getTracksFor('text');
+    if (!tracks || tracks.length === 0) return;
+    subtitleSel.innerHTML = '<option value="-1">关闭</option>';
+    tracks.forEach((t, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = t.lang || t.id || `字幕 ${i+1}`;
+      subtitleSel.appendChild(opt);
+    });
+    showTrackBar();
+    log(`DASH: ${tracks.length} 个字幕轨`, 'ok');
+  } catch(e) {}
+}
+
+function setSubtitle(val) {
+  const v = parseInt(val);
+  if (currentEngine === 'hls' && hlsInst) {
+    hlsInst.subtitleTrack = v;
+    log(v === -1 ? 'HLS 关闭字幕' : `HLS 切换字幕 → ${hlsInst.subtitleTracks[v]?.name || v}`, 'info');
+  } else if (currentEngine === 'dash' && dashInst) {
+    try {
+      if (v === -1) {
+        dashInst.setTextTrack(-1);
+        log('DASH 关闭字幕', 'info');
+      } else {
+        const tracks = dashInst.getTracksFor('text');
+        if (tracks && tracks[v]) {
+          dashInst.setCurrentTrack(tracks[v]);
+          dashInst.setTextTrack(v);
+          log(`DASH 切换字幕 → ${tracks[v].lang || v}`, 'info');
+        }
+      }
+    } catch(e) {}
+  }
+}
+
+// ══════════════════════════════════════
+// DESTROY
+// ══════════════════════════════════════
+function destroyAll() {
+  if (hlsInst)  { hlsInst.destroy();  hlsInst = null; }
+  if (dashInst) { dashInst.reset();   dashInst = null; }
+  if (flvInst)  { flvInst.destroy();  flvInst = null; }
+  if (ticker)   { clearInterval(ticker); ticker = null; }
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  video.style.display = 'none';
+  placeholder.style.display = 'flex';
+  statsInline.style.display = 'none';
+  resetTrackBar();
   clearErr();
+  currentEngine = '';
 }
 
-function stopAll(){
+function stopAll() {
   destroyAll(); setDot('');
-  nowTitle.textContent='— 已停止 —';
-  activeIdx=-1; renderChannels();
-  log('已停止播放','info');
+  nowTitle.textContent = '— 已停止 —';
+  activeIdx = -1; renderChannels();
+  log('已停止播放', 'info');
 }
 
-function loadStream(url,name){
-  url=url||urlInput.value.trim();
-  if(!url){showError('请输入流媒体链接');return;}
-  urlInput.value=url;
+// ══════════════════════════════════════
+// LOAD STREAM
+// ══════════════════════════════════════
+function loadStream(url, name) {
+  url = url || urlInput.value.trim();
+  if (!url) { showError('请输入流媒体链接'); return; }
+  urlInput.value = url;
   destroyAll(); setDot('loading');
-  nowTitle.textContent=name||(url.length>55?url.slice(0,55)+'…':url);
-  log(`加载: ${name||url.slice(0,60)}`,'info');
+  nowTitle.textContent = name || (url.length > 55 ? url.slice(0,55)+'…' : url);
+  log(`加载: ${name || url.slice(0,60)}`, 'info');
 
-  const p=proto==='auto'?detectProto(url):proto;
-  document.getElementById('sStat').textContent=protoLabel(p);
+  const p = proto === 'auto' ? detectProto(url) : proto;
+  document.getElementById('sStat').textContent = protoLabel(p);
 
-  video.onloadedmetadata=()=>{
-    const w=video.videoWidth,h=video.videoHeight;
-    if(w&&h) document.getElementById('rStat').textContent=`${w}×${h}`;
-    document.getElementById('dStat').textContent=fmtTime(video.duration);
-    log(`元数据: ${w||'?'}×${h||'?'}, ${fmtTime(video.duration)}`,'ok');
+  video.onloadedmetadata = () => {
+    const w = video.videoWidth, h = video.videoHeight;
+    if (w && h) document.getElementById('rStat').textContent = `${w}×${h}`;
+    document.getElementById('dStat').textContent = fmtTime(video.duration);
+    log(`元数据: ${w||'?'}×${h||'?'}, ${fmtTime(video.duration)}`, 'ok');
   };
-  video.onplay=()=>{setDot('live');statsInline.style.display='flex';log('▶ 播放中','ok');startTicker();};
-  video.onpause=()=>{setDot('ready');log('⏸ 暂停','info');};
-  video.onwaiting=()=>{setDot('loading');};
-  video.onended=()=>{setDot('ready');log('⏹ 播放结束','info');};
-  video.onerror=()=>{
-    const c=video.error?video.error.code:'?';
-    const msgs={1:'中止',2:'网络错误/CORS跨域',3:'解码失败',4:'格式不支持'};
+  video.onplay    = () => { setDot('live'); statsInline.style.display='flex'; log('▶ 播放中','ok'); startTicker(); };
+  video.onpause   = () => { setDot('ready'); log('⏸ 暂停','info'); };
+  video.onwaiting = () => { setDot('loading'); };
+  video.onended   = () => { setDot('ready'); log('⏹ 结束','info'); };
+  video.onerror   = () => {
+    const c = video.error ? video.error.code : '?';
+    const msgs = {1:'中止',2:'网络/CORS错误',3:'解码失败',4:'格式不支持'};
     showError(`播放失败(${c}): ${msgs[c]||'未知'}`);
   };
 
-  video.style.display='block';
-  placeholder.style.display='none';
+  video.style.display = 'block';
+  placeholder.style.display = 'none';
 
-  switch(p){
+  switch (p) {
     case 'hls':   loadHLS(url);   break;
     case 'dash':  loadDASH(url);  break;
     case 'flv':   loadFLV(url);   break;
@@ -559,176 +606,215 @@ function loadStream(url,name){
   }
 }
 
-function loadHLS(url){
-  if(Hls.isSupported()){
-    hlsInst=new Hls({enableWorker:true,lowLatencyMode:true});
-    hlsInst.loadSource(url); hlsInst.attachMedia(video);
-    hlsInst.on(Hls.Events.MANIFEST_PARSED,()=>{
-      log('HLS Manifest 解析成功','ok');
-      video.play().catch(()=>log('自动播放被拦截，请手动点击','info'));
-    });
-    hlsInst.on(Hls.Events.ERROR,(e,d)=>{
-      if(d.fatal){showError(`HLS: ${d.type}/${d.details}`);hlsInst.destroy();}
-      else log(`HLS警告: ${d.details}`,'err');
-    });
-    hlsInst.on(Hls.Events.LEVEL_SWITCHED,(e,d)=>log(`HLS 质量 Level ${d.level}`,'info'));
-    document.getElementById('sStat').textContent='HLS (hls.js)';
-  } else if(video.canPlayType('application/vnd.apple.mpegurl')){
-    loadNative(url);
-    document.getElementById('sStat').textContent='HLS (Native)';
-  } else { showError('浏览器不支持 HLS'); }
-}
+// ── HLS ──────────────────────────────
+function loadHLS(url) {
+  if (!Hls.isSupported()) {
+    if (video.canPlayType('application/vnd.apple.mpegurl')) { loadNative(url); return; }
+    showError('浏览器不支持 HLS'); return;
+  }
+  currentEngine = 'hls';
+  hlsInst = new Hls({ enableWorker:true, lowLatencyMode:true });
+  hlsInst.loadSource(url);
+  hlsInst.attachMedia(video);
 
-function loadDASH(url){
-  if(typeof dashjs==='undefined'){showError('dash.js 未加载');return;}
-  dashInst=dashjs.MediaPlayer().create();
-  dashInst.initialize(video,url,true);
-  dashInst.updateSettings({streaming:{abr:{autoSwitchBitrate:{video:true}}}});
-  dashInst.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED,()=>{
-    log('DASH/MPD 流初始化成功','ok');
-    document.getElementById('sStat').textContent='DASH/MPD (dash.js)';
+  hlsInst.on(Hls.Events.MANIFEST_PARSED, () => {
+    log('HLS Manifest 解析成功', 'ok');
+    video.play().catch(() => log('自动播放被拦截，请手动点击','info'));
+    // build track options after manifest
+    setTimeout(() => {
+      buildQualityOptions_HLS();
+      buildAudioOptions_HLS();
+      buildSubtitleOptions_HLS();
+    }, 500);
   });
-  dashInst.on(dashjs.MediaPlayer.events.ERROR,e=>{
-    showError('DASH/MPD: '+(e.error?.message||e.error?.code||JSON.stringify(e.error)));
+  hlsInst.on(Hls.Events.ERROR, (e,d) => {
+    if (d.fatal) { showError(`HLS: ${d.type}/${d.details}`); hlsInst.destroy(); }
+    else log(`HLS警告: ${d.details}`, 'err');
   });
-  dashInst.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED,e=>{
-    log(`DASH 质量切换 → ${e.mediaType} Q${e.newQuality}`,'info');
+  hlsInst.on(Hls.Events.LEVEL_SWITCHED, (e,d) => {
+    const lvl = hlsInst.levels[d.level];
+    if (lvl) document.getElementById('rStat').textContent = `${lvl.width}×${lvl.height}`;
+    log(`HLS 画质 → ${lvl?.height||'?'}p`, 'info');
   });
+  document.getElementById('sStat').textContent = 'HLS (hls.js)';
 }
 
-function loadFLV(url){
-  if(!flvjs.isSupported()){showError('浏览器不支持 FLV');return;}
-  const isLive=url.includes('live')||!url.toLowerCase().endsWith('.flv');
-  flvInst=flvjs.createPlayer({type:'flv',url,isLive,hasAudio:true,hasVideo:true});
-  flvInst.attachMediaElement(video); flvInst.load();
-  flvInst.on(flvjs.Events.ERROR,(t,d)=>showError(`FLV: ${t} — ${JSON.stringify(d)}`));
-  flvInst.on(flvjs.Events.METADATA_ARRIVED,()=>log('FLV Metadata 到达','ok'));
-  flvInst.play();
-  document.getElementById('sStat').textContent=isLive?'HTTP-FLV (flv.js)':'FLV (flv.js)';
-}
+// ── DASH / MPD ───────────────────────
+function loadDASH(url) {
+  if (typeof dashjs === 'undefined') { showError('dash.js 未加载'); return; }
+  currentEngine = 'dash';
+  dashInst = dashjs.MediaPlayer().create();
+  dashInst.initialize(video, url, true);
+  dashInst.updateSettings({ streaming:{ abr:{ autoSwitchBitrate:{ video:true } } } });
 
-function loadNative(url){
-  video.src=url; video.load();
-  video.play().catch(()=>log('自动播放被拦截，请手动点击播放','info'));
-  document.getElementById('sStat').textContent='Native HTML5';
-}
-
-function startTicker(){
-  ticker=setInterval(()=>{
-    if(video.buffered.length>0){
-      const ahead=Math.max(0,video.buffered.end(video.buffered.length-1)-video.currentTime);
-      document.getElementById('bStat').textContent=ahead.toFixed(1)+'s';
+  dashInst.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+    log('DASH/MPD 流初始化成功', 'ok');
+    document.getElementById('sStat').textContent = 'DASH/MPD (dash.js)';
+    setTimeout(() => {
+      buildQualityOptions_DASH();
+      buildAudioOptions_DASH();
+      buildSubtitleOptions_DASH();
+    }, 800);
+  });
+  dashInst.on(dashjs.MediaPlayer.events.ERROR, e => {
+    showError('DASH/MPD: ' + (e.error?.message || e.error?.code || JSON.stringify(e.error)));
+  });
+  dashInst.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED, e => {
+    if (e.mediaType === 'video') {
+      try {
+        const info = dashInst.getBitrateInfoListFor('video');
+        const cur  = dashInst.getQualityFor('video');
+        if (info && info[cur]) {
+          document.getElementById('rStat').textContent = `${info[cur].width||'?'}×${info[cur].height||'?'}`;
+          log(`DASH 画质 → ${info[cur].height||'?'}p  ${Math.round(info[cur].bitrate/1000)}k`, 'info');
+        }
+      } catch(ex) {}
     }
-    document.getElementById('dStat').textContent=fmtTime(video.duration);
-  },1000);
+  });
 }
 
-function demo(url,p,name){
-  document.querySelectorAll('.proto-btn').forEach(b=>b.classList.toggle('active',b.dataset.p===p));
-  proto=p; loadStream(url,name);
+// ── FLV ──────────────────────────────
+function loadFLV(url) {
+  if (!flvjs.isSupported()) { showError('浏览器不支持 FLV'); return; }
+  currentEngine = 'flv';
+  const isLive = url.includes('live') || !url.toLowerCase().endsWith('.flv');
+  flvInst = flvjs.createPlayer({ type:'flv', url, isLive, hasAudio:true, hasVideo:true });
+  flvInst.attachMediaElement(video); flvInst.load();
+  flvInst.on(flvjs.Events.ERROR, (t,d) => showError(`FLV: ${t} — ${JSON.stringify(d)}`));
+  flvInst.on(flvjs.Events.METADATA_ARRIVED, () => log('FLV Metadata 到达', 'ok'));
+  flvInst.play();
+  document.getElementById('sStat').textContent = isLive ? 'HTTP-FLV (flv.js)' : 'FLV (flv.js)';
 }
 
-// ── CHANNELS ──
-function loadChannels(){ try{channels=JSON.parse(localStorage.getItem('sl_ch')||'[]');}catch{channels=[];} }
-function saveChannels(){ localStorage.setItem('sl_ch',JSON.stringify(channels)); }
+// ── NATIVE ───────────────────────────
+function loadNative(url) {
+  currentEngine = 'native';
+  video.src = url; video.load();
+  video.play().catch(() => log('自动播放被拦截，请手动点击播放','info'));
+  document.getElementById('sStat').textContent = 'Native HTML5';
+}
 
-function renderChannels(){
-  document.getElementById('chCount').textContent=channels.length;
-  chList.innerHTML='';
-  if(channels.length===0){
-    chList.innerHTML='<div class="empty-ch">还没有频道<br><span style="font-size:.58rem">输入名称和链接后添加</span></div>';
+function startTicker() {
+  ticker = setInterval(() => {
+    if (video.buffered.length > 0) {
+      const ahead = Math.max(0, video.buffered.end(video.buffered.length-1) - video.currentTime);
+      document.getElementById('bStat').textContent = ahead.toFixed(1)+'s';
+    }
+    document.getElementById('dStat').textContent = fmtTime(video.duration);
+  }, 1000);
+}
+
+function demo(url, p, name) {
+  document.querySelectorAll('.proto-btn').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+  proto = p; loadStream(url, name);
+}
+
+// ══════════════════════════════════════
+// CHANNELS
+// ══════════════════════════════════════
+function loadChannels() { try { channels = JSON.parse(localStorage.getItem('sl_ch')||'[]'); } catch { channels=[]; } }
+function saveChannels() { localStorage.setItem('sl_ch', JSON.stringify(channels)); }
+
+function renderChannels() {
+  document.getElementById('chCount').textContent = channels.length;
+  chList.innerHTML = '';
+  if (channels.length === 0) {
+    chList.innerHTML = '<div class="empty-ch">还没有频道<br><span style="font-size:.58rem">输入名称和链接后添加</span></div>';
     return;
   }
-  channels.forEach((ch,i)=>{
-    const p=detectProto(ch.url);
-    const div=document.createElement('div');
-    div.className='ch-item'+(i===activeIdx?' active':'');
-    div.innerHTML=`
+  channels.forEach((ch, i) => {
+    const p = detectProto(ch.url);
+    const div = document.createElement('div');
+    div.className = 'ch-item' + (i === activeIdx ? ' active' : '');
+    div.innerHTML = `
       <div class="ch-play-btn"></div>
       <div class="ch-info">
         <div class="ch-name">${esc(ch.name)}</div>
         <div class="ch-proto">${protoLabel(p)}</div>
       </div>
       <button class="ch-del" onclick="delCh(event,${i})">✕</button>`;
-    div.addEventListener('click',()=>playCh(i));
+    div.addEventListener('click', () => playCh(i));
     chList.appendChild(div);
   });
 }
 
-function playCh(i){
-  activeIdx=i; renderChannels();
-  proto='auto';
-  document.querySelectorAll('.proto-btn').forEach(b=>b.classList.toggle('active',b.dataset.p==='auto'));
-  loadStream(channels[i].url,channels[i].name);
+function playCh(i) {
+  activeIdx = i; renderChannels();
+  proto = 'auto';
+  document.querySelectorAll('.proto-btn').forEach(b => b.classList.toggle('active', b.dataset.p === 'auto'));
+  loadStream(channels[i].url, channels[i].name);
 }
 
-function addChannel(){
-  const name=document.getElementById('chName').value.trim();
-  const url=document.getElementById('chUrl').value.trim();
-  if(!name){log('请输入频道名称','err');return;}
-  if(!url){log('请输入链接','err');return;}
-  channels.push({name,url}); saveChannels(); renderChannels();
-  document.getElementById('chName').value='';
-  document.getElementById('chUrl').value='';
-  log(`已添加频道: ${name}`,'ok');
+function addChannel() {
+  const name = document.getElementById('chName').value.trim();
+  const url  = document.getElementById('chUrl').value.trim();
+  if (!name) { log('请输入频道名称','err'); return; }
+  if (!url)  { log('请输入链接','err'); return; }
+  channels.push({name, url}); saveChannels(); renderChannels();
+  document.getElementById('chName').value = '';
+  document.getElementById('chUrl').value  = '';
+  log(`已添加频道: ${name}`, 'ok');
 }
 
-function saveFromPlayer(){
-  const url=urlInput.value.trim();
-  if(!url){log('播放器中没有链接','err');return;}
-  const name=prompt('输入频道名称：','频道 '+(channels.length+1));
-  if(!name) return;
-  channels.push({name:name.trim(),url}); saveChannels(); renderChannels();
-  log(`已保存: ${name}`,'ok');
+function saveFromPlayer() {
+  const url = urlInput.value.trim();
+  if (!url) { log('播放器中没有链接','err'); return; }
+  const name = prompt('输入频道名称：', '频道 '+(channels.length+1));
+  if (!name) return;
+  channels.push({name:name.trim(), url}); saveChannels(); renderChannels();
+  log(`已保存: ${name}`, 'ok');
 }
 
-function delCh(e,i){
+function delCh(e, i) {
   e.stopPropagation();
-  if(!confirm(`删除「${channels[i].name}」?`)) return;
+  if (!confirm(`删除「${channels[i].name}」?`)) return;
   channels.splice(i,1);
-  if(activeIdx===i) activeIdx=-1;
-  else if(activeIdx>i) activeIdx--;
+  if (activeIdx===i) activeIdx=-1;
+  else if (activeIdx>i) activeIdx--;
   saveChannels(); renderChannels();
   log('频道已删除','info');
 }
 
-function clearChannels(){
-  if(!confirm('确定清空所有频道？')) return;
+function clearChannels() {
+  if (!confirm('确定清空所有频道？')) return;
   channels=[]; activeIdx=-1; saveChannels(); renderChannels();
   log('频道列表已清空','info');
 }
 
-function exportChannels(){
-  const blob=new Blob([JSON.stringify(channels,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download='streamlab-channels.json'; a.click();
+function exportChannels() {
+  const blob = new Blob([JSON.stringify(channels,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'streamlab-channels.json'; a.click();
   log('频道已导出','ok');
 }
 
-function importChannels(){
-  const inp=document.createElement('input');
-  inp.type='file'; inp.accept='.json';
-  inp.onchange=e=>{
-    const f=e.target.files[0]; if(!f) return;
-    const r=new FileReader();
-    r.onload=ev=>{
-      try{
-        const data=JSON.parse(ev.target.result);
-        if(!Array.isArray(data)) throw new Error('格式不正确');
-        channels=[...channels,...data]; saveChannels(); renderChannels();
-        log(`导入 ${data.length} 个频道`,'ok');
-      }catch(err){log('导入失败: '+err.message,'err');}
+function importChannels() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data)) throw new Error('格式不正确');
+        channels = [...channels, ...data]; saveChannels(); renderChannels();
+        log(`导入 ${data.length} 个频道`, 'ok');
+      } catch(err) { log('导入失败: '+err.message,'err'); }
     };
     r.readAsText(f);
   };
   inp.click();
 }
 
-urlInput.addEventListener('keydown',e=>{if(e.key==='Enter')loadStream();});
-document.getElementById('chUrl').addEventListener('keydown',e=>{if(e.key==='Enter')addChannel();});
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+urlInput.addEventListener('keydown', e => { if(e.key==='Enter') loadStream(); });
+document.getElementById('chUrl').addEventListener('keydown', e => { if(e.key==='Enter') addChannel(); });
 
 loadChannels(); renderChannels();
-log('hls.js · dash.js · flv.js 全部加载完成','ok');
+log('hls.js · dash.js · flv.js 加载完成 · v3.0 支持画质/音轨/字幕', 'ok');
 </script>
 </body>
 </html>
